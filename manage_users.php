@@ -4,18 +4,20 @@ include 'connect.php';
 if(!isset($_SESSION['admin_id'])) { header("Location: index.php"); exit(); }
 
 $message = "";
+$successAlert = false;
 
 // Handle Hard Delete for Users
 if(isset($_POST['btnDeleteUser'])) {
-    $delete_id = $_POST['delete_id'];
+    $delete_id = mysqli_real_escape_string($connection, $_POST['delete_id']);
     
     // 1. Delete dependent records first to prevent foreign key constraint errors
     mysqli_query($connection, "DELETE FROM tblentry_record WHERE user_id = '$delete_id'");
-    mysqli_query($connection, "DELETE FROM tblvisit WHERE visitor_id = '$delete_id' OR host_student_id = '$delete_id' OR host_personnel_id = '$delete_id'");
+    mysqli_query($connection, "DELETE FROM tblvisit WHERE visitor_id = '$delete_id'");
     
     // 2. Delete the base user (ON DELETE CASCADE handles tblstudent, tblpersonnel, tblvisitor automatically)
     if(mysqli_query($connection, "DELETE FROM tbluser WHERE user_id = '$delete_id'")) {
         $message = "<div style='color: green; padding: 10px; background: #e6ffe6; margin-bottom: 15px; border-radius: 10px;'>User and all associated logs permanently deleted.</div>";
+        $successAlert = true;
     } else {
         $message = "<div style='color: red; padding: 10px; background: #ffe6e6; margin-bottom: 15px; border-radius: 10px;'>Error deleting user.</div>";
     }
@@ -91,6 +93,12 @@ $result = mysqli_query($connection, $query);
     </div>
 
 </div>
+
+<?php if($successAlert): ?>
+<script>
+    alert('Deleted successfully.');
+</script>
+<?php endif; ?>
 
 </body>
 </html>

@@ -36,8 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
         } elseif ($type == 'Student') {
             $checkStu = mysqli_query($connection, "SELECT * FROM tblstudent WHERE user_id = '$uid'");
             if(mysqli_num_rows($checkStu) == 0) {
-                $cy = $_POST['course_yr'] ?? 'N/A';
-                mysqli_query($connection, "INSERT INTO tblstudent (user_id, course, year_level, status) VALUES ('$uid', '$cy', 1, 'Active')");
+                $course = $_POST['course'] ?? 'N/A';
+                $year = intval($_POST['year_level'] ?? 1);
+                mysqli_query($connection, "INSERT INTO tblstudent (user_id, course, year_level, status) VALUES ('$uid', '$course', $year, 'Active')");
             }
         } elseif ($type == 'Personnel') {
             $checkPer = mysqli_query($connection, "SELECT * FROM tblpersonnel WHERE user_id = '$uid'");
@@ -79,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Campus Access Control - Main Gate</title>
+    <title>Wild Guard - Main Gate</title>
     <link rel="stylesheet" href="css/site.css">
     <style>
         .form-group select {
@@ -91,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
 <body>
 
 <header class="main-header">
-    <h1>Campus Access Control - Main Gate</h1>
+    <h1>Wild Guard - Main Gate</h1>
     <div class="datetime">
         <span class="live-date"></span><br><span class="live-time"></span>
     </div>
@@ -114,7 +115,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
             <div class="required-lbl">*required</div>
             <div class="form-group"><label>ID:</label> <input type="text" name="id_num" required></div>
             <div class="required-lbl">*required</div>
-            <div class="form-group"><label>Course & Year:</label> <input type="text" name="course_yr"></div>
+            <div class="form-group"><label>Course:</label>
+                <select name="course" required>
+                    <option value="">Select Course</option>
+                    <option value="Elementary">Elementary</option>
+                    <option value="JHS">JHS</option>
+                    <option value="SHS">SHS</option>
+                    <option value="BSARCH">BSARCH</option>
+                    <option value="BSChE">BSChE</option>
+                    <option value="BSCE">BSCE</option>
+                    <option value="BSCpE">BSCpE</option>
+                    <option value="BSEE">BSEE</option>
+                    <option value="BSECE">BSECE</option>
+                    <option value="BSIE">BSIE</option>
+                    <option value="BSME">BSME</option>
+                    <option value="BSME-MC">BSME-MC</option>
+                    <option value="BSME-MR">BSME-MR</option>
+                    <option value="BSME-MS">BSME-MS</option>
+                    <option value="BSMinE">BSMinE</option>
+                    <option value="BSCS">BSCS</option>
+                    <option value="BSIT">BSIT</option>
+                    <option value="BSIS">BSIS</option>
+                    <option value="BSMMA">BSMMA</option>
+                    <option value="BSA">BSA</option>
+                    <option value="BSAIS">BSAIS</option>
+                    <option value="BSMA">BSMA</option>
+                    <option value="BSBA">BSBA</option>
+                    <option value="BSHM">BSHM</option>
+                    <option value="BSTM">BSTM</option>
+                    <option value="BSOA">BSOA</option>
+                    <option value="BPA">BPA</option>
+                    <option value="BSN">BSN</option>
+                    <option value="BSPsych">BSPsych</option>
+                    <option value="BSED">BSED</option>
+                    <option value="BEED">BEED</option>
+                    <option value="BTVTED">BTVTED</option>
+                    <option value="BS Biology">BS Biology</option>
+                </select>
+            </div>
+            <div class="required-lbl">*required</div>
+            <div class="form-group"><label>Year Level:</label>
+                <select name="year_level" required>
+                    <option value="">Select Year</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
             <div class="required-lbl">*required</div>
             <button type="submit" name="btnEnter" class="btn-enter">Enter</button>
         </form>

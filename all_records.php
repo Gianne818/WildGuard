@@ -8,11 +8,16 @@ if(!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] === 'Guard') {
     exit(); 
 }
 
-// Fetch ALL historical records
-$query = "SELECT e.entry_id, e.user_id, e.entry_time, e.exit_time, u.first_name, u.last_name, u.user_type 
+// Fetch ALL historical entry/exit events as a flat timeline
+$query = "SELECT e.entry_id, e.user_id, u.first_name, u.last_name, u.user_type, e.entry_time AS event_time, 'IN' AS event_type 
           FROM tblentry_record e 
           JOIN tbluser u ON e.user_id = u.user_id 
-          ORDER BY e.entry_time DESC";
+          UNION ALL 
+          SELECT e.entry_id, e.user_id, u.first_name, u.last_name, u.user_type, e.exit_time AS event_time, 'OUT' AS event_type 
+          FROM tblentry_record e 
+          JOIN tbluser u ON e.user_id = u.user_id 
+          WHERE e.exit_time IS NOT NULL 
+          ORDER BY event_time DESC, event_type DESC";
 $result = mysqli_query($connection, $query);
 ?>
 
@@ -36,7 +41,7 @@ $result = mysqli_query($connection, $query);
     <div style="display:flex; align-items:center; gap:15px;">
         <a href="dashboard.php" style="background:rgba(255,255,255,0.2); color:#fff; padding:5px 15px; border-radius:20px; text-decoration:none; font-size:14px; border: 1px solid #fff;">&larr; Back to Dashboard</a>
     </div>
-    <h1>Master Entry Log</h1>
+    <h1>Master Entry/Exit Log</h1>
     <div class="datetime"></div>
 </header>
 
@@ -52,25 +57,23 @@ $result = mysqli_query($connection, $query);
                     <th>User ID</th>
                     <th>Name</th>
                     <th>Type</th>
-                    <th>Entry Time</th>
-                    <th>Exit Time</th>
-                    <th>Status</th>
+                    <th>Event</th>
+                    <th>Time</th>
                 </tr>
             </thead>
             <tbody>
                 <?php while($row = mysqli_fetch_assoc($result)): 
-                    $isOut = !is_null($row['exit_time']);
+                    $isOut = $row['event_type'] === 'OUT';
                 ?>
                 <tr>
                     <td><?php echo htmlspecialchars($row['entry_id']); ?></td>
                     <td><?php echo htmlspecialchars($row['user_id']); ?></td>
                     <td><?php echo htmlspecialchars($row['last_name'] . ', ' . $row['first_name']); ?></td>
                     <td><?php echo htmlspecialchars($row['user_type']); ?></td>
-                    <td><?php echo date('M d, Y h:i A', strtotime($row['entry_time'])); ?></td>
-                    <td><?php echo $isOut ? date('M d, Y h:i A', strtotime($row['exit_time'])) : '---'; ?></td>
                     <td class="<?php echo $isOut ? 'status-out' : 'status-in'; ?>">
-                        <?php echo $isOut ? 'OUT' : 'INSIDE'; ?>
+                        <?php echo htmlspecialchars($row['event_type']); ?>
                     </td>
+                    <td><?php echo date('M d, Y h:i A', strtotime($row['event_time'])); ?></td>
                 </tr>
                 <?php endwhile; ?>
                 

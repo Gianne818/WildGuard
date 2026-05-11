@@ -48,7 +48,7 @@ $activeVis = mysqli_fetch_assoc($activeVisQuery)['active_count'];
         
         <a href="logout.php" style="margin-left:5px; background:#cc0000; color:#fff; padding:5px 15px; border-radius:15px; text-decoration:none; font-size:14px; border: 1px solid #fff;">Logout</a>
     </div>
-    <h1>CAMPUS ACCESS CONTROL</h1>
+    <h1>WILD GUARD</h1>
     <div class="datetime">
         <span class="live-date"></span><br><span class="live-time"></span>
     </div>
@@ -59,18 +59,20 @@ $activeVis = mysqli_fetch_assoc($activeVisQuery)['active_count'];
     <div class="dash-grid">
         <div class="dash-panel" style="display: flex; flex-direction: column; align-items: center;">
             <h2 style="text-align:center; margin-top:0;">Active Visitors Today:<br><span style="font-size: 32px;"><?php echo $activeVis; ?></span></h2>
-            <div style="width: 100%; font-size:12px; margin-top:10px; flex: 1; overflow-y: auto; background: rgba(255,255,255,0.5); padding: 10px; border-radius: 8px;">
+            <div style="width: 100%; font-size:12px; margin-top:10px; flex: 1; max-height: 340px; overflow-y: auto; background: rgba(255,255,255,0.5); padding: 10px; border-radius: 8px;">
                 <?php
-                // Fetch sidebar logs for TODAY ONLY
-                $sidebarLogs = mysqli_query($connection, "SELECT e.user_id, e.exit_time FROM tblentry_record e WHERE DATE(e.entry_time) = CURDATE() ORDER BY e.entry_time DESC LIMIT 15");
+                // Fetch sidebar logs for TODAY ONLY as a flat IN/OUT timeline
+                $sidebarLogs = mysqli_query($connection, "SELECT e.entry_id, e.user_id, 'IN' AS event_type, e.entry_time AS event_time FROM tblentry_record e JOIN tbluser u ON e.user_id = u.user_id WHERE DATE(e.entry_time) = CURDATE() UNION ALL SELECT e.entry_id, e.user_id, 'OUT' AS event_type, e.exit_time AS event_time FROM tblentry_record e JOIN tbluser u ON e.user_id = u.user_id WHERE DATE(e.entry_time) = CURDATE() AND e.exit_time IS NOT NULL ORDER BY event_time DESC, event_type DESC LIMIT 15");
                 while($sLog = mysqli_fetch_assoc($sidebarLogs)): 
-                    $isOut = !is_null($sLog['exit_time']);
+                    $isOut = $sLog['event_type'] === 'OUT';
                 ?>
                 <p style="margin: 5px 0; border-bottom: 1px solid #ddd; padding-bottom: 3px;">
                     <?php echo htmlspecialchars($sLog['user_id']); ?> 
                     <span style="float:right; color:<?php echo $isOut ? '#cc0000' : '#009900'; ?>; font-weight:bold;">
-                        <?php echo $isOut ? 'OUT' : 'IN'; ?>
+                        <?php echo htmlspecialchars($sLog['event_type']); ?>
                     </span>
+                    <br>
+                    <small style="color:#666;"><?php echo date('H:i:s', strtotime($sLog['event_time'])); ?></small>
                 </p>
                 <?php endwhile; ?>
             </div>
