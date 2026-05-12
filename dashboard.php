@@ -3,7 +3,7 @@ session_start();
 include 'connect.php';
 if(!isset($_SESSION['admin_id']) || !isset($_SESSION['admin_role'])) { header("Location: index.php"); exit(); }
 
-// Fetch the Most Recent Entry for the Center Card (TODAY ONLY)
+// recent entries today
 $latestQuery = "SELECT e.*, u.first_name, u.last_name, u.user_type 
                 FROM tblentry_record e 
                 JOIN tbluser u ON e.user_id = u.user_id 
@@ -12,8 +12,8 @@ $latestQuery = "SELECT e.*, u.first_name, u.last_name, u.user_type
 $latestResult = mysqli_query($connection, $latestQuery);
 $latest = mysqli_fetch_assoc($latestResult);
 
-// Fetch Active Visitors Count (TODAY ONLY)
-$activeVisQuery = mysqli_query($connection, "SELECT COUNT(*) as active_count FROM tblentry_record e JOIN tbluser u ON e.user_id = u.user_id WHERE u.user_type = 'Visitor' AND e.exit_time IS NULL AND DATE(e.entry_time) = CURDATE()");
+// get count 
+$activeVisQuery = mysqli_query($connection, "SELECT COUNT(*) as active_count FROM tblentry_record e JOIN tbluser u ON e.user_id = u.user_id WHERE e.exit_time IS NULL AND DATE(e.entry_time) = CURDATE()");
 $activeVis = mysqli_fetch_assoc($activeVisQuery)['active_count'];
 ?>
 <!DOCTYPE html>
