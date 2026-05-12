@@ -2,6 +2,9 @@
 session_start();
 include 'connect.php';
 
+// Ensure PHP uses the correct local timezone for timestamps
+date_default_timezone_set('Asia/Manila');
+
 $message = "";
 $messageType = ""; 
 $lastScan = null; 
@@ -109,12 +112,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
     <div class="form-section">
         <form id="form-student" method="post" action="kiosk.php">
             <input type="hidden" name="user_type" value="Student">
-            <div class="form-group"><label>First Name:</label> <input type="text" name="fname" required></div>
-            <div class="required-lbl">*required</div>
-            <div class="form-group"><label>Last Name:</label> <input type="text" name="lname" required></div>
-            <div class="required-lbl">*required</div>
-            <div class="form-group"><label>ID:</label> <input type="text" name="id_num" required></div>
-            <div class="required-lbl">*required</div>
+            <div class="form-group"><label>First Name:</label> <input type="text" name="fname" required> <div class="required-lbl">*required</div></div>
+            <div class="form-group"><label>Last Name:</label> <input type="text" name="lname" required> <div class="required-lbl">*required</div></div>
+            <div class="form-group"><label>ID:</label> <input type="text" name="id_num" required> <div class="required-lbl">*required</div></div>
             <div class="form-group"><label>Course:</label>
                 <select name="course" required>
                     <option value="">Select Course</option>
@@ -151,9 +151,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
                     <option value="BEED">BEED</option>
                     <option value="BTVTED">BTVTED</option>
                     <option value="BS Biology">BS Biology</option>
-                </select>
+                </select> <div class="required-lbl">*required</div>
             </div>
-            <div class="required-lbl">*required</div>
             <div class="form-group"><label>Year Level:</label>
                 <select name="year_level" required>
                     <option value="">Select Year</option>
@@ -161,20 +160,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
                     <option value="2">2</option>
                     <option value="3">3</option>
                     <option value="4">4</option>
-                </select>
+                </select> <div class="required-lbl">*required</div>
             </div>
-            <div class="required-lbl">*required</div>
             <button type="submit" name="btnEnter" class="btn-enter">Enter</button>
         </form>
 
         <form id="form-personnel" style="display:none;" method="post" action="kiosk.php">
             <input type="hidden" name="user_type" value="Personnel">
-            <div class="form-group"><label>First Name:</label> <input type="text" name="fname" required></div>
-            <div class="required-lbl">*required</div>
-            <div class="form-group"><label>Last Name:</label> <input type="text" name="lname" required></div>
-            <div class="required-lbl">*required</div>
-            <div class="form-group"><label>ID:</label> <input type="text" name="id_num" required></div>
-            <div class="required-lbl">*required</div>
+            <div class="form-group"><label>First Name:</label> <input type="text" name="fname" required> <div class="required-lbl">*required</div></div>
+            <div class="form-group"><label>Last Name:</label> <input type="text" name="lname" required> <div class="required-lbl">*required</div></div>
+            <div class="form-group"><label>ID:</label> <input type="text" name="id_num" required> <div class="required-lbl">*required</div></div>
             <div class="form-group">
                 <label>Role:</label> 
                 <select name="role" required>
@@ -189,13 +184,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
 
         <form id="form-visitor" style="display:none;" method="post" action="kiosk.php">
             <input type="hidden" name="user_type" value="Visitor">
-            <div class="form-group"><label>First Name:</label> <input type="text" name="fname" required></div>
-            <div class="required-lbl">*required</div>
-            <div class="form-group"><label>Last Name:</label> <input type="text" name="lname" required></div>
-            <div class="required-lbl">*required</div>
+            <div class="form-group"><label>First Name:</label> <input type="text" name="fname" required> <div class="required-lbl">*required</div></div>
+            <div class="form-group"><label>Last Name:</label> <input type="text" name="lname" required> <div class="required-lbl">*required</div></div>
             <div class="form-group"><label>Contact No:</label> <input type="text" name="contact"></div>
-            <div class="form-group"><label>Purpose:</label> <input type="text" name="purpose" required></div>
-            <div class="required-lbl">*required</div>
+            <div class="form-group"><label>Purpose:</label> <input type="text" name="purpose" required> <div class="required-lbl">*required</div></div>
             
             <button type="submit" name="btnEnter" class="btn-enter" style="background: linear-gradient(to bottom, #d28c46, #8b5120);">Print Pass</button>
         </form>

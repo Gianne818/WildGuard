@@ -77,6 +77,14 @@ body {
 .preview-card p { margin: 8px 0; font-weight: bold; font-size: 15px; }
 .preview-card span { font-weight: normal; }
 
+/* required label styling */
+.required-lbl {
+    color: #c0392b; /* red */
+    font-size: 12px; /* smaller text */
+    margin-left: 8px;
+    font-weight: 600;
+}
+
 .dash-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; height: 100%; width: 100%; }
 .dash-panel { background: rgba(255,255,255,0.85); border-radius: 30px; padding: 20px; }
 .dash-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
