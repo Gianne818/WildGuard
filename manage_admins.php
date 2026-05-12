@@ -2,7 +2,7 @@
 session_start();
 include 'connect.php';
 
-// Strict RBAC: Kick out Guards (Level 1)
+// guards not allowed to manage admins
 if(!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] === 'Guard') { 
     header("Location: dashboard.php"); 
     exit(); 
@@ -11,21 +11,21 @@ if(!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] === 'Guard') {
 $isSysAdmin = ($_SESSION['admin_role'] === 'System Admin');
 $message = "";
 
-// CREATE Admin/Guard
+//  create Admin/Guard
 if(isset($_POST['btnAddAdmin'])) {
     $uid = $_POST['admin_id'];
     $fname = $_POST['fname'];
     $lname = $_POST['lname'];
     $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
     
-    // Auto-assign levels based on role to strictly enforce 3-2-1 hierarchy
+    // access levels
     if ($isSysAdmin) {
         $role = $_POST['role'];
         if ($role === 'System Admin') $level = 3;
         elseif ($role === 'Security Admin') $level = 2;
         else $level = 1; // Guard
     } else {
-        // Security Admins are forced to only create Level 1 Guards
+        // sec admins can only create guard
         $role = 'Guard';
         $level = 1;
     }
@@ -40,10 +40,11 @@ if(isset($_POST['btnAddAdmin'])) {
     }
 }
 
-// UPDATE Admin/Guard
+// Update Admin/Guard
 if(isset($_POST['btnUpdateAdmin'])) {
     $uid = $_POST['update_id'];
     
+    //same story
     if ($isSysAdmin) {
         $role = $_POST['role'];
         if ($role === 'System Admin') $level = 3;
@@ -58,7 +59,7 @@ if(isset($_POST['btnUpdateAdmin'])) {
     $message = "<div style='color: green; padding: 10px; background: #e6ffe6; margin-bottom: 15px; border-radius: 10px;'>Account Updated Successfully to $role (Level $level).</div>";
 }
 
-// DELETE Admin/Guard
+// delete Admin/Guard
 if(isset($_POST['btnDeleteAdmin'])) {
     $delete_id = $_POST['delete_id'];
     

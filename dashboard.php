@@ -12,7 +12,7 @@ $latestQuery = "SELECT e.*, u.first_name, u.last_name, u.user_type
 $latestResult = mysqli_query($connection, $latestQuery);
 $latest = mysqli_fetch_assoc($latestResult);
 
-// get count 
+// get count of everyone
 $activeVisQuery = mysqli_query($connection, "SELECT COUNT(*) as active_count FROM tblentry_record e JOIN tbluser u ON e.user_id = u.user_id WHERE e.exit_time IS NULL AND DATE(e.entry_time) = CURDATE()");
 $activeVis = mysqli_fetch_assoc($activeVisQuery)['active_count'];
 ?>

@@ -1,3 +1,5 @@
+// example only
+
 <?php    
 include 'connect.php';    
 require_once 'includes/header.php';

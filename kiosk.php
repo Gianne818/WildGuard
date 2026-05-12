@@ -34,9 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
 
         // Subtypes
         if($type == 'Visitor') {
+            // insert on visitor table
             $contact = $_POST['contact'] ?? '';
             mysqli_query($connection, "INSERT INTO tblvisitor (user_id, contact_number) VALUES ('$uid', '$contact')");
         } elseif ($type == 'Student') {
+            // insert on student table
             $checkStu = mysqli_query($connection, "SELECT * FROM tblstudent WHERE user_id = '$uid'");
             if(mysqli_num_rows($checkStu) == 0) {
                 $course = $_POST['course'] ?? 'N/A';
@@ -44,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
                 mysqli_query($connection, "INSERT INTO tblstudent (user_id, course, year_level, status) VALUES ('$uid', '$course', $year, 'Active')");
             }
         } elseif ($type == 'Personnel') {
+            // insert on personnel table
             $checkPer = mysqli_query($connection, "SELECT * FROM tblpersonnel WHERE user_id = '$uid'");
             if(mysqli_num_rows($checkPer) == 0) {
                 $role = $_POST['role'] ?? 'Staff';
