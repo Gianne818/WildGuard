@@ -6,6 +6,11 @@ if(!isset($_SESSION['admin_id'])) { header("Location: index.php"); exit(); }
 $message = "";
 $successAlert = false;
 
+// Pagination settings
+$perPage = 20;
+$page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $perPage;
+
 // Handle Hard Delete for Users
 if(isset($_POST['btnDeleteUser'])) {
     $delete_id = mysqli_real_escape_string($connection, $_POST['delete_id']);
@@ -23,8 +28,14 @@ if(isset($_POST['btnDeleteUser'])) {
     }
 }
 
-// Fetch all NON-Admin users
-$query = "SELECT * FROM tbluser WHERE user_type != 'Admin' ORDER BY user_type, last_name ASC";
+// Fetch paginated NON-Admin users and total count
+$countQ = "SELECT COUNT(*) AS cnt FROM tbluser WHERE user_type != 'Admin'";
+$countR = mysqli_query($connection, $countQ);
+$totalRows = 0;
+if($countR){ $cr = mysqli_fetch_assoc($countR); $totalRows = (int)$cr['cnt']; }
+$totalPages = max(1, (int)ceil($totalRows / $perPage));
+
+$query = "SELECT * FROM tbluser WHERE user_type != 'Admin' ORDER BY user_type, last_name ASC LIMIT $perPage OFFSET $offset";
 $result = mysqli_query($connection, $query);
 ?>
 
@@ -92,11 +103,26 @@ $result = mysqli_query($connection, $query);
         </table>
     </div>
 
+    <!-- Pagination controls -->
+    <div style="display:flex; justify-content:center; margin-top:16px; gap:8px;">
+        <?php if($page > 1): ?>
+            <a href="?page=1" class="btn" style="padding:6px 10px; background:#f0f0f0; border-radius:6px; text-decoration:none;">&laquo; First</a>
+            <a href="?page=<?php echo $page-1; ?>" class="btn" style="padding:6px 10px; background:#f0f0f0; border-radius:6px; text-decoration:none;">&lsaquo; Prev</a>
+        <?php endif; ?>
+
+        <span style="align-self:center; color:#444;">Page <?php echo $page; ?> of <?php echo $totalPages; ?></span>
+
+        <?php if($page < $totalPages): ?>
+            <a href="?page=<?php echo $page+1; ?>" class="btn" style="padding:6px 10px; background:#f0f0f0; border-radius:6px; text-decoration:none;">Next &rsaquo;</a>
+            <a href="?page=<?php echo $totalPages; ?>" class="btn" style="padding:6px 10px; background:#f0f0f0; border-radius:6px; text-decoration:none;">Last &raquo;</a>
+        <?php endif; ?>
+    </div>
+
 </div>
 
 <?php if($successAlert): ?>
 <script>
-    alert('Deleted successfully.');
+    (function(m){ window._msgQueue = window._msgQueue || []; window._msgQueue.push({m: m, t: 'success'}); })('Deleted successfully.');
 </script>
 <?php endif; ?>
 

@@ -8,16 +8,35 @@ if(!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] === 'Guard') {
     exit(); 
 }
 
-// Fetch ALL historical entry/exit events as a flat timeline
-$query = "SELECT e.entry_id, e.user_id, u.first_name, u.last_name, u.user_type, e.entry_time AS event_time, 'IN' AS event_type 
-          FROM tblentry_record e 
-          JOIN tbluser u ON e.user_id = u.user_id 
-          UNION ALL 
-          SELECT e.entry_id, e.user_id, u.first_name, u.last_name, u.user_type, e.exit_time AS event_time, 'OUT' AS event_type 
-          FROM tblentry_record e 
-          JOIN tbluser u ON e.user_id = u.user_id 
-          WHERE e.exit_time IS NOT NULL 
-          ORDER BY event_time DESC, event_type DESC";
+// Pagination settings
+$perPage = 20;
+$page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $perPage;
+
+// Base union query (as derived table) to allow counting and pagination
+$baseUnion = "(
+    SELECT e.entry_id, e.user_id, u.first_name, u.last_name, u.user_type, e.entry_time AS event_time, 'IN' AS event_type
+    FROM tblentry_record e
+    JOIN tbluser u ON e.user_id = u.user_id
+    UNION ALL
+    SELECT e.entry_id, e.user_id, u.first_name, u.last_name, u.user_type, e.exit_time AS event_time, 'OUT' AS event_type
+    FROM tblentry_record e
+    JOIN tbluser u ON e.user_id = u.user_id
+    WHERE e.exit_time IS NOT NULL
+)";
+
+// Get total count for pagination
+$countSql = "SELECT COUNT(*) AS cnt FROM $baseUnion AS t";
+$countRes = mysqli_query($connection, $countSql);
+$totalRows = 0;
+if($countRes){
+    $cRow = mysqli_fetch_assoc($countRes);
+    $totalRows = (int)$cRow['cnt'];
+}
+$totalPages = max(1, (int)ceil($totalRows / $perPage));
+
+// Fetch the paginated slice
+$query = "SELECT * FROM $baseUnion AS t ORDER BY event_time DESC, event_type DESC LIMIT $perPage OFFSET $offset";
 $result = mysqli_query($connection, $query);
 ?>
 
@@ -84,6 +103,21 @@ $result = mysqli_query($connection, $query);
                 <?php endif; ?>
             </tbody>
         </table>
+    </div>
+
+    <!-- Pagination controls -->
+    <div style="display:flex; justify-content:center; margin-top:16px; gap:8px;">
+        <?php if($page > 1): ?>
+            <a href="?page=1" class="btn" style="padding:6px 10px; background:#f0f0f0; border-radius:6px; text-decoration:none;">&laquo; First</a>
+            <a href="?page=<?php echo $page-1; ?>" class="btn" style="padding:6px 10px; background:#f0f0f0; border-radius:6px; text-decoration:none;">&lsaquo; Prev</a>
+        <?php endif; ?>
+
+        <span style="align-self:center; color:#444;">Page <?php echo $page; ?> of <?php echo $totalPages; ?></span>
+
+        <?php if($page < $totalPages): ?>
+            <a href="?page=<?php echo $page+1; ?>" class="btn" style="padding:6px 10px; background:#f0f0f0; border-radius:6px; text-decoration:none;">Next &rsaquo;</a>
+            <a href="?page=<?php echo $totalPages; ?>" class="btn" style="padding:6px 10px; background:#f0f0f0; border-radius:6px; text-decoration:none;">Last &raquo;</a>
+        <?php endif; ?>
     </div>
 
 </div>

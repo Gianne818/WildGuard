@@ -18,10 +18,10 @@ if(isset($_POST['btnLogin'])) {
             header("Location: dashboard.php");
             exit();
         } else {
-            echo "<script>alert('Incorrect Password');</script>";
+            echo "<script>(function(m){ window._msgQueue = window._msgQueue || []; window._msgQueue.push({m: m, t: 'danger'}); })('Incorrect Password');</script>";
         }
     } else {
-        echo "<script>alert('Admin not found');</script>";
+        echo "<script>(function(m){ window._msgQueue = window._msgQueue || []; window._msgQueue.push({m: m, t: 'warning'}); })('Admin not found');</script>";
     }
 }
 ?>

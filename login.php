@@ -33,15 +33,15 @@
 		$row = mysqli_fetch_array($result);
 		
 		if($count== 0){
-			echo "<script language='javascript'>
-						alert('username not existing.');
+			echo "<script>
+						(function(m){ window._msgQueue = window._msgQueue || []; window._msgQueue.push({m: m, t: 'danger'}); })('username not existing.');
 				  </script>";
 				  
 		//}else if($row[3] != $pwd) {		
 		}else if(!password_verify($pwd,$hashed_pword)){
-			echo "<script language='javascript'>
-				alert('Incorrect password');
-			     </script>";
+			echo "<script>
+				(function(m){ window._msgQueue = window._msgQueue || []; window._msgQueue.push({m: m, t: 'danger'}); })('Incorrect password');
+				 </script>";
 		}else {		
 			$_SESSION['username']=$row[0];
 			header("location: dashboard.php");
