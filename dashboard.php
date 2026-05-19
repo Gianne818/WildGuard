@@ -3,7 +3,7 @@ session_start();
 include 'connect.php';
 if(!isset($_SESSION['admin_id']) || !isset($_SESSION['admin_role'])) { header("Location: index.php"); exit(); }
 
-// recent entries today
+// recent entries today for 
 $latestQuery = "SELECT e.*, u.first_name, u.last_name, u.user_type 
                 FROM tblentry_record e 
                 JOIN tbluser u ON e.user_id = u.user_id 
@@ -61,8 +61,8 @@ $activeVis = mysqli_fetch_assoc($activeVisQuery)['active_count'];
             <h2 style="text-align:center; margin-top:0;">Active Visitors Today:<br><span style="font-size: 32px;"><?php echo $activeVis; ?></span></h2>
             <div style="width: 100%; font-size:12px; margin-top:10px; flex: 1; max-height: 340px; overflow-y: auto; background: rgba(255,255,255,0.5); padding: 10px; border-radius: 8px;">
                 <?php
-                // Fetch sidebar logs for TODAY ONLY as a flat IN/OUT timeline
-                $sidebarLogs = mysqli_query($connection, "SELECT e.entry_id, e.user_id, 'IN' AS event_type, e.entry_time AS event_time FROM tblentry_record e JOIN tbluser u ON e.user_id = u.user_id WHERE DATE(e.entry_time) = CURDATE() UNION ALL SELECT e.entry_id, e.user_id, 'OUT' AS event_type, e.exit_time AS event_time FROM tblentry_record e JOIN tbluser u ON e.user_id = u.user_id WHERE DATE(e.entry_time) = CURDATE() AND e.exit_time IS NOT NULL ORDER BY event_time DESC, event_type DESC LIMIT 15");
+                // fetch sidebar logs for today. like recent entries
+                $sidebarLogs = mysqli_query($connection, "SELECT e.entry_id, e.user_id, 'IN' AS event_type, e.entry_time AS event_time FROM tblentry_record e JOIN tbluser u ON e.user_id = u.user_id WHERE DATE(e.entry_time) = CURDATE() UNION ALL SELECT e.entry_id, e.user_id, 'OUT' AS event_type, e.exit_time AS event_time FROM tblentry_record e JOIN tbluser u ON e.user_id = u.user_id WHERE DATE(e.entry_time) = CURDATE() AND e.exit_time IS NOT NULL ORDER BY event_time DESC, event_type DESC");
                 while($sLog = mysqli_fetch_assoc($sidebarLogs)): 
                     $isOut = $sLog['event_type'] === 'OUT';
                 ?>

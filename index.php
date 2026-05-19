@@ -6,7 +6,7 @@ if(isset($_POST['btnLogin'])) {
     $uid = $_POST['log_id'];
     $pass = $_POST['password'];
     
-    // Join tbladmin to get the role
+    // join tbladmin to get the role
     $query = "SELECT u.*, a.admin_role FROM tbluser u JOIN tbladmin a ON u.user_id = a.admin_id WHERE u.user_id = '$uid' AND u.user_type = 'Admin'";
     $result = mysqli_query($connection, $query);
     

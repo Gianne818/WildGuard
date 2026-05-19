@@ -2,18 +2,18 @@
 session_start();
 include 'connect.php';
 
-// Strict RBAC: Kick out Guards (Level 1)
+// no guards allowed
 if(!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] === 'Guard') { 
     header("Location: dashboard.php"); 
     exit(); 
 }
 
-// Pagination settings
+// same stor pagination
 $perPage = 20;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 
-// Base union query (as derived table) to allow counting and pagination
+// full join
 $baseUnion = "(
     SELECT e.entry_id, e.user_id, u.first_name, u.last_name, u.user_type, e.entry_time AS event_time, 'IN' AS event_type
     FROM tblentry_record e
@@ -24,6 +24,11 @@ $baseUnion = "(
     JOIN tbluser u ON e.user_id = u.user_id
     WHERE e.exit_time IS NOT NULL
 )";
+
+// $baseUnion = "(SELECT e.entry_id, e.user_id, u.first_name, u.last_name, u.user_type, e.entry_time AS event_time, 'IN' AS event_type
+//     FROM tblentry_record e JOIN tbluser u ON e.user_id = u.user_id)";
+
+
 
 // Get total count for pagination
 $countSql = "SELECT COUNT(*) AS cnt FROM $baseUnion AS t";

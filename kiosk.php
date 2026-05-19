@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
     $today = date('Y-m-d'); 
     
     if($type == 'Visitor') {
-        $uid = 'V-' . date('Y-m-d-H:i:s'); 
+        $uid = 'V-' . date('Y-m-d-H:i:s'); // generate this kind of pass
     } else {
         $uid = trim($_POST['id_num']);
     }
@@ -33,8 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
             }
         }
 
+        // if message is empty bec no error, we can insert into tbluser
         if (empty($message)) {
-            // Base User Table (Password is NULL for kiosk entries)
             $checkUser = mysqli_query($connection, "SELECT * FROM tbluser WHERE user_id = '$uid'");
             if(mysqli_num_rows($checkUser) == 0) {
                 mysqli_query($connection, "INSERT INTO tbluser (user_id, first_name, last_name, user_type, password) VALUES ('$uid', '$fname', '$lname', '$type', NULL)");
@@ -61,15 +61,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
             }
         }
         
-        // Visitor Purpose
+        // tbl visit
         if($type == 'Visitor') {
              $purpose = $_POST['purpose'] ?? 'General Visit';
              mysqli_query($connection, "INSERT INTO tblvisit (visitor_id, visit_date, purpose) VALUES ('$uid', '$today', '$purpose')");
         }
         
-        // Logging
+        // entry rec
         $openEntry = mysqli_query($connection, "SELECT entry_id FROM tblentry_record WHERE user_id = '$uid' AND exit_time IS NULL ORDER BY entry_time DESC LIMIT 1");
         
+        // if has entry with null exit time, out
         if(mysqli_num_rows($openEntry) > 0) {
             $row = mysqli_fetch_assoc($openEntry);
             $entry_id = $row['entry_id'];

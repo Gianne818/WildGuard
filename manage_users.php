@@ -6,8 +6,8 @@ if(!isset($_SESSION['admin_id'])) { header("Location: index.php"); exit(); }
 $message = "";
 $successAlert = false;
 
-// Pagination settings
-$perPage = 20;
+// pagination settings
+$perPage = 20; // 20 only for testnig
 $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 
@@ -15,11 +15,11 @@ $offset = ($page - 1) * $perPage;
 if(isset($_POST['btnDeleteUser'])) {
     $delete_id = mysqli_real_escape_string($connection, $_POST['delete_id']);
     
-    // 1. Delete dependent records first to prevent foreign key constraint errors
+    // delete first dependent records to avoid foreign key constraints
     mysqli_query($connection, "DELETE FROM tblentry_record WHERE user_id = '$delete_id'");
     mysqli_query($connection, "DELETE FROM tblvisit WHERE visitor_id = '$delete_id'");
     
-    // 2. Delete the base user (ON DELETE CASCADE handles tblstudent, tblpersonnel, tblvisitor automatically)
+    // next from tbluser
     if(mysqli_query($connection, "DELETE FROM tbluser WHERE user_id = '$delete_id'")) {
         $message = "<div style='color: green; padding: 10px; background: #e6ffe6; margin-bottom: 15px; border-radius: 10px;'>User and all associated logs permanently deleted.</div>";
         $successAlert = true;
@@ -28,7 +28,7 @@ if(isset($_POST['btnDeleteUser'])) {
     }
 }
 
-// Fetch paginated NON-Admin users and total count
+// only fetch non admins
 $countQ = "SELECT COUNT(*) AS cnt FROM tbluser WHERE user_type != 'Admin'";
 $countR = mysqli_query($connection, $countQ);
 $totalRows = 0;
@@ -103,7 +103,7 @@ $result = mysqli_query($connection, $query);
         </table>
     </div>
 
-    <!-- Pagination controls -->
+
     <div style="display:flex; justify-content:center; margin-top:16px; gap:8px;">
         <?php if($page > 1): ?>
             <a href="?page=1" class="btn" style="padding:6px 10px; background:#f0f0f0; border-radius:6px; text-decoration:none;">&laquo; First</a>
