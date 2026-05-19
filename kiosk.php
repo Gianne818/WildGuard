@@ -2,7 +2,6 @@
 session_start();
 include 'connect.php';
 
-// Ensure PHP uses the correct local timezone for timestamps
 date_default_timezone_set('Asia/Manila');
 
 $message = "";
@@ -26,19 +25,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
         $message = "Error: ID Number is required.";
         $messageType = "error";
     } else {
-        // Base User Table (Password is NULL for kiosk entries)
-        $checkUser = mysqli_query($connection, "SELECT * FROM tbluser WHERE user_id = '$uid'");
-        if(mysqli_num_rows($checkUser) == 0) {
-            mysqli_query($connection, "INSERT INTO tbluser (user_id, first_name, last_name, user_type, password) VALUES ('$uid', '$fname', '$lname', '$type', NULL)");
+        if ($type == 'Visitor') {
+            $contact = trim($_POST['contact'] ?? '');
+            if (empty($contact)) {
+                $message = "Error: Contact Number is required for visitors.";
+                $messageType = "error";
+            }
+        }
+
+        if (empty($message)) {
+            // Base User Table (Password is NULL for kiosk entries)
+            $checkUser = mysqli_query($connection, "SELECT * FROM tbluser WHERE user_id = '$uid'");
+            if(mysqli_num_rows($checkUser) == 0) {
+                mysqli_query($connection, "INSERT INTO tbluser (user_id, first_name, last_name, user_type, password) VALUES ('$uid', '$fname', '$lname', '$type', NULL)");
+            }
         }
 
         // Subtypes
         if($type == 'Visitor') {
-            // insert on visitor table
-            $contact = $_POST['contact'] ?? '';
+            $contact = trim($_POST['contact'] ?? '');
             mysqli_query($connection, "INSERT INTO tblvisitor (user_id, contact_number) VALUES ('$uid', '$contact')");
         } elseif ($type == 'Student') {
-            // insert on student table
             $checkStu = mysqli_query($connection, "SELECT * FROM tblstudent WHERE user_id = '$uid'");
             if(mysqli_num_rows($checkStu) == 0) {
                 $course = $_POST['course'] ?? 'N/A';
@@ -46,7 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
                 mysqli_query($connection, "INSERT INTO tblstudent (user_id, course, year_level, status) VALUES ('$uid', '$course', $year, 'Active')");
             }
         } elseif ($type == 'Personnel') {
-            // insert on personnel table
             $checkPer = mysqli_query($connection, "SELECT * FROM tblpersonnel WHERE user_id = '$uid'");
             if(mysqli_num_rows($checkPer) == 0) {
                 $role = $_POST['role'] ?? 'Staff';
@@ -189,7 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btnEnter'])) {
             <input type="hidden" name="user_type" value="Visitor">
             <div class="form-group"><label>First Name:</label> <input type="text" name="fname" required> <div class="required-lbl">*required</div></div>
             <div class="form-group"><label>Last Name:</label> <input type="text" name="lname" required> <div class="required-lbl">*required</div></div>
-            <div class="form-group"><label>Contact No:</label> <input type="text" name="contact"></div>
+<div class="form-group"><label>Contact No:</label> <input type="text" name="contact" required> <div class="required-lbl">*required</div></div>
             <div class="form-group"><label>Purpose:</label> <input type="text" name="purpose" required> <div class="required-lbl">*required</div></div>
             
             <button type="submit" name="btnEnter" class="btn-enter" style="background: linear-gradient(to bottom, #d28c46, #8b5120);">Print Pass</button>
